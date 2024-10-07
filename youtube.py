@@ -57,7 +57,6 @@ app=customtkinter.CTk()
 app.geometry("720x720")
 app.resizable(False,False)
 app.title("Youtube Vid Downloader")
-app.iconbitmap('/home/xenon/youtube/icon.ico')
 customtkinter.set_default_color_theme("blue")
 customtkinter.set_appearance_mode("dark")
 
