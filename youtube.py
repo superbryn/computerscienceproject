@@ -2,12 +2,14 @@ import customtkinter
 import tkinter               
 from pytubefix import YouTube
 import os
+import csv
 
 def mp4download():
     try:
         ytUrl = link.get() #inserted URL
         ytObject = YouTube(ytUrl) 
-
+        with open("logs.csv","a") as file: #save the logs into a csv file
+            csv.writer(file, delimiter=",").writerow(ytObject.title,ytUrl)
         videoStream = ytObject.streams.filter(resolution='1440p', progressive=False).first()
         if not videoStream:
             videoStream = ytObject.streams.filter(progressive=False).order_by('resolution').desc().first()
@@ -23,7 +25,7 @@ def mp4download():
             #clears the audio and video files that was used to merge
             os.remove(video_file_path)
             os.remove(audio_file_path)
-            link.delete(0, customtkinter.END) #delete the link after downloading
+            link.delete(0, customtkinter.END) #deletes the link after downloading
         else:
             debugLabel.configure(text="Audio and Video file not supporting")
     except Exception as e:
@@ -33,6 +35,8 @@ def mp3download(): #download youtube videos in mp3 file type
     try:
         ytUrl=link.get() #inserted url 
         ytObject=YouTube(ytUrl)
+        with open("logs.csv","a") as file: #save the logs into a csv file
+            csv.writer(file, delimiter=",").writerow(ytObject.title,ytUrl)
         audio=ytObject.streams.get_audio_only()
         audio.download(mp3=True)
         link.delete(0, customtkinter.END)
@@ -52,6 +56,15 @@ def DownloadMenu(): #main menu
     except:
         debugLabel.configure(text="something went wrong")
 
+def entry_focus_in(event):
+    if link.get() == "Paste The Link":
+        link.delete(0, 'end')
+        link.configure(fg_color='black')
+def entry_focus_out(event):
+    if link.get() == "":
+        link.insert(0,"Paste The Link")
+        link.configure(fg_color='gray')
+
 #main settings => UI configuration
 app=customtkinter.CTk()
 app.geometry("720x720")
@@ -61,12 +74,15 @@ customtkinter.set_default_color_theme("blue")
 customtkinter.set_appearance_mode("dark")
 
 #UI => user interface setup
-title=customtkinter.CTkLabel(app,text="Paste the URL here")
-title.pack(padx=10,pady=10)
+#title=customtkinter.CTkLabel(app,text="Paste the URL here")
+#title.pack(padx=10,pady=10)
 
 #input => input the link over here
 linkVariable=tkinter.StringVar()
-link = customtkinter.CTkEntry(app, width=480, height=30, textvariable=linkVariable)
+link = customtkinter.CTkEntry(app,width=480, height=30, textvariable=linkVariable)
+link.insert(0,"Paste The Link")
+link.bind("<FocusIn>",entry_focus_in)
+link.bind("<FocusOut>",entry_focus_out)
 link.pack(padx=10,pady=10)
 
 #datatype => [MP3/MP4]
