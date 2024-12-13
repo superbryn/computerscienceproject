@@ -3,6 +3,7 @@ from pytubefix import YouTube
 import tkinter
 from moviepy import VideoFileClip,AudioFileClip
 import os
+import csv
 
 class YoutubeVideoDownloader:
     def __init__(self, url):
@@ -17,6 +18,8 @@ class YoutubeVideoDownloader:
     def mp4downloader(self):
         try:
             self.catchLink()
+            with open("logs.csv","a") as f:
+                csv.writer(f,delimiter=",").writerow(["mp4",self.youtubeObject.title,self.ytUrl])
             videoStream = self.youtubeObject.streams.filter(resolution="1080p", progressive=False).first()
             if not videoStream:
                 videoStream = self.youtubeObject.streams.filter(progressive=True).order_by('resolution').desc().first()
@@ -39,9 +42,11 @@ class YoutubeVideoDownloader:
                 raise Exception("Something went wrong")
         except Exception as e:
             return f"Error while downloading as MP4: {e}"
-    def mp3download(self):
+    def mp3downloader(self):
         try:
             self.catchLink()
+            with open("logs.csv","a") as f:
+                csv.writer(f,delimiter=",").writerow(["mp3",self.youtubeObject.title,self.ytUrl])
             audio = self.youtubeObject.streams.get_audio_only()
             audio.download(mp3=True)
             return f"{self.youtubeObject.title} has completed downloading"
@@ -65,50 +70,45 @@ class SpeedYUI:
         self.title = customtkinter.CTkLabel(self.app, text="Paste the URL here")
         self.title.pack(padx=10, pady=10)
 
-        # Input Entry for URL
         self.link_variable = tkinter.StringVar()
         self.link = customtkinter.CTkEntry(self.app, width=480, height=30, textvariable=self.link_variable)
         self.link.pack(padx=10, pady=10)
 
-        # Segment Button (MP3/MP4)
         self.datatype = customtkinter.CTkSegmentedButton(self.app, values=["MP3", "MP4"])
         self.datatype.pack()
 
-        # Download Button
         self.download_button = customtkinter.CTkButton(self.app, text="Download", command=self.download, fg_color="red", hover="blue")
         self.download_button.pack(padx=10, pady=10)
 
-        # Debug Label
         self.debug_label = customtkinter.CTkLabel(self.app, text="")
         self.debug_label.pack(padx=10)
 
-        # Progress Bar (Currently not functional)
         self.progress_bar = customtkinter.CTkLabel(self.app, text="0")
 
         self.progress_bar.pack(padx=10)
 
-        def download(self):
-            try:
-                url = self.link.get()
-                if not url:
-                    self.debug_label.configure(text="Please enter a URL.")
-                    return
-                
-                self.downloader = YoutubeVideoDownloader(url)
+    def download(self):
+        try:
+            url = self.link.get()
+            if not url:
+                self.debug_label.configure(text="Please enter a URL.")
+                return
+            
+            self.downloader = YoutubeVideoDownloader(url)
 
-                datatype = self.datatype.get()
-                if datatype == "MP4":
-                    result = self.downloader.download_mp4()
-                elif datatype == "MP3":
-                    result = self.downloader.download_mp3()
-                else:
-                    self.debug_label.configure(text="Please select a valid format (MP3 or MP4).")
-                    return
+            datatype = self.datatype.get()
+            if datatype == "MP4":
+                result = self.downloader.mp3downloader()
+            elif datatype == "MP3":
+                result = self.downloader.mp4downloader()
+            else:
+                self.debug_label.configure(text="Please select a valid format (MP3 or MP4).")
+                return
 
-                self.debug_label.configure(text=result)
-                self.link.delete(0, customtkinter.END)  # Clear the URL input field
-            except Exception as e:
-                self.debug_label.configure(text=f"Something went wrong: {e}")
+            self.debug_label.configure(text=result)
+            self.link.delete(0, customtkinter.END)  # Clear the URL input field
+        except Exception as e:
+            self.debug_label.configure(text=f"Something went wrong: {e}")
 
 if __name__ == "__main__":
     app = customtkinter.CTk()
