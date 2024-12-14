@@ -59,7 +59,7 @@ class SpeedYUI: #UI
         self.app.geometry("750x500")
         self.app.resizable(False,False)
         self.app.title("SPEEDY CONVERTER")
-        self.logoPath= os.path.abspath('SPEEDY/icon.ico')
+        self.logoPath= os.path.abspath('icon.ico')
         self.app.iconbitmap(self.logoPath)
         customtkinter.set_default_color_theme("blue")
         customtkinter.set_appearance_mode("dark")
@@ -69,7 +69,7 @@ class SpeedYUI: #UI
         self.Widgets()
     
     def Widgets(self):
-        self.background_image_path = os.path.abspath("SPEEDY/new.png")
+        self.background_image_path = os.path.abspath("new.png")
         print(self.background_image_path)
         if os.path.exists(self.background_image_path):
             self.myImage = customtkinter.CTkImage(dark_image=Image.open(self.background_image_path), size=(750, 500))
