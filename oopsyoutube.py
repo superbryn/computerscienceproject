@@ -135,6 +135,7 @@ class SpeedYUI: #UI
             self.link.delete(0, customtkinter.END)
         except Exception as e:
             self.debug_label.configure(text=f"Something went wrong: {e}")
+            return
             
 
 if __name__ == "__main__":
