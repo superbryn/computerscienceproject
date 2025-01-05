@@ -1,7 +1,7 @@
-#youtube vid downloading project
+# youtube vid downloading project
 downloads youtube vids and audios using pytubefix
 
-##installation
+## installation
 
 recommend using : python -m venv venv
 windows : venv\Scripts\activate
